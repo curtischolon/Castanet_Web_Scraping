@@ -21,9 +21,9 @@ def extract_listing_title_from_result(soup):
 
     ads = []
     for prod_container in soup.find_all(name='a', class_='prod_container'):
-        for div in prod_container.find_all(name='h2'):
-            print(div.get_text())
-            ads.append(div.get_text())
+        for div in prod_container.find(name='h2'):
+            print(div)
+            ads.append(div)
 
     return ads
 
