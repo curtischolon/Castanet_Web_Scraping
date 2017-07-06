@@ -13,7 +13,7 @@ page = requests.get(URL)
 soup = BeautifulSoup(page.text, 'html.parser')
 
 
-# print(soup.prettify())
+#input(soup.prettify())
 
 def extract_listing_title_from_result(soup):
     """pulls the ad title for each listing on the current page"""
@@ -29,9 +29,9 @@ def extract_listing_price_from_result(soup):
     """pulls the listing price for each listing on the current page"""
     prices = []
     for description in soup.find_all(name = 'div', class_ = 'descr'):
-            for price in description.find(name = 'div', class_ = 'price'):
-                print(price)
-                prices.append(price)
+        for price in description.find_all(name = 'div', class_ = 'price'):
+            print(price.get_text())
+            prices.append(price.get_text())
 
     return prices
 
@@ -44,6 +44,9 @@ def extract_listing_location_from_result(soup):
             location.append(city)
 
     return location
+
+#TODO - capture URL and Post ID, log contents to file, check on next iteration whether the listing exists
+#already, or not. Parse through pages to the end of the listings.
 
 
 ads = extract_listing_title_from_result(soup)
