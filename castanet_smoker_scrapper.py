@@ -13,7 +13,8 @@ page = requests.get(URL)
 soup = BeautifulSoup(page.text, 'html.parser')
 
 
-#input(soup.prettify())
+# input(soup.prettify())
+
 
 def extract_listing_title_from_result(soup):
     """pulls the ad title for each listing on the current page"""
@@ -25,28 +26,31 @@ def extract_listing_title_from_result(soup):
 
     return ads
 
+
 def extract_listing_price_from_result(soup):
     """pulls the listing price for each listing on the current page"""
     prices = []
-    for description in soup.find_all(name = 'div', class_ = 'descr'):
-        for price in description.find_all(name = 'div', class_ = 'price'):
+    for description in soup.find_all(name='div', class_='descr'):
+        for price in description.find_all(name='div', class_='price'):
             print(price.get_text())
             prices.append(price.get_text())
 
     return prices
 
+
 def extract_listing_location_from_result(soup):
     """pulls the listing location for each listing on the current page"""
     location = []
-    for div in soup.find_all(name = 'div', class_ = 'pdate'):
-        for city in div.find(name = 'span'):
+    for div in soup.find_all(name='div', class_='pdate'):
+        for city in div.find(name='span'):
             print(city)
             location.append(city)
 
     return location
 
-#TODO - capture URL and Post ID, log contents to file, check on next iteration whether the listing exists
-#already, or not. Parse through pages to the end of the listings.
+
+# TODO - capture URL and Post ID, log contents to file, check on next iteration whether the listing exists
+# already, or not. Parse through pages to the end of the listings.
 
 
 ads = extract_listing_title_from_result(soup)
