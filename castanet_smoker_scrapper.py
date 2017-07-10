@@ -46,14 +46,14 @@ def download_image(urls):
         image_url = image_element.get('src')
 
         # download the image
-        image = requests.get(image_url, stream=True)
+        # image = requests.get(image_url, stream=True)
         # input(image)
 
         # save to local directory
-        image_file = open(os.path.join(image_directory, os.path.basename(image_url)), 'wb')
-        for bytes in image.iter_content(100000):
-            image_file.write(bytes)
-        image_file.close()
+        # image_file = open(os.path.join(image_directory, os.path.basename(image_url)), 'wb')
+        # for bytes in image.iter_content(100000):
+            # image_file.write(bytes)
+        # image_file.close()
 
         image_paths.append(os.path.join(image_directory, os.path.basename(image_url)))
 
@@ -67,7 +67,7 @@ def extract_listing_title_from_result(soup, ads, ad_count):
             ads.append(div)
             ad_count += 1
 
-    print(ads)
+    # print(ads)
     print(ad_count)
     return ads, ad_count
 
@@ -75,9 +75,12 @@ def extract_listing_title_from_result(soup, ads, ad_count):
 def extract_listing_price_from_result(soup, prices):
     """pulls the listing price for each listing on the current page"""
     for description in soup.find_all(name='div', class_='descr'):
-        for price in description.find_all(name='div', class_='price'):
+        price = description.find(name='div', class_='price')
+        if price == None:
+            prices.append('No Price')
+        else:
             prices.append(price.get_text())
-    print(prices)
+    # print(prices)
     return prices
 
 
@@ -86,7 +89,7 @@ def extract_listing_location_from_result(soup, location):
     for div in soup.find_all(name='div', class_='pdate'):
         for city in div.find(name='span'):
             location.append(city)
-    print(locations)
+    # print(locations)
     return location
 
 
@@ -103,8 +106,8 @@ def extract_url_from_result(soup, url, listing_id):
             listing_id.append(id_)
         except:
             listing_id.append('Not found')
-    print(url)
-    print(listing_id)
+    # print(url)
+    # print(listing_id)
     return url, listing_id
 
 
@@ -144,14 +147,34 @@ while ad_count < number_of_ads:
 
     page += 1
 
-# TODO - add feature that compares the listing details to what has already been downloaded - skip duplicates
+# Download images based on ad ID
 image_list = download_image(urls)
 
-print(ads)
-print(prices)
-print(locations)
-print(urls)
-print(ids)
-print(number_of_ads)
-print(ad_count)
-print(image_list)
+# create empty dataframe to store listings
+columns = ['Ad_Name', 'Price', 'Location', 'URL', 'Image_Path']
+listing_df = pd.DataFrame(columns=columns)
+
+# compile listings to dataframe
+row = 0
+for i in range(number_of_ads):
+    # increment row for dataframe
+    row = (i+1)
+
+    # create variable to store current row
+    try:
+        all_listings = [ads[i], prices[i], locations[i], urls[i], image_list[i]]
+    except:
+        print("list index out of range")
+
+    # append to dataframe
+    listing_df.loc[row] = all_listings
+
+listing_path = os.path.join('C:\\', 'users', 'ccholon', 'my documents', 'castanet images', 'listings.csv')
+
+listing_df.to_csv(listing_path, encoding='utf-8')
+
+print('ads: ', len(ads))
+print('prices: ', len(prices))
+print('locations: ', len(locations))
+print('urls: ', len(urls))
+print('ids: ', len(ids))
