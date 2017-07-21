@@ -186,7 +186,7 @@ for i in range(number_of_ads):
     listing_df.loc[row] = all_listings
 
 # export file to excel
-listing_path = os.path.join('C:\\', 'users', 'ccholon', 'my documents', 'castanet images', 'listings.xlsx')
+listing_path = os.path.join('C:\\', 'users', 'ccholon', 'my documents', 'castanet images', 'bbq_listings.xlsx')
 xlwriter = pd.ExcelWriter(listing_path, engine='xlsxwriter')
 
 listing_df.to_excel(xlwriter, sheet_name='Sheet 1')
