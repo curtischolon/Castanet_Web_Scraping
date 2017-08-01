@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import time
 import xlsxwriter
+import shelve
 
 
 def find_listing_date(soup, dates):
@@ -124,6 +125,10 @@ def extract_url_from_result(soup, url, listing_id):
 
 
 # --MAIN--
+shelf_file = shelve.open('bbq_listings')
+past_listings = shelf_file['past_listings']
+shelf_file.close()
+
 # base URL - Castanet BBQ, Smokers, Heaters
 base_url = "https://classifieds.castanet.net/cat/house-home/garden_yard_patio/bbqs_smokers_heaters/?p="
 
@@ -165,9 +170,10 @@ while ad_count < number_of_ads:
 # Download images based on ad ID
 image_list = download_image(urls)
 
-# create empty dataframe to store listings
+# create empty dataframes to store all Castanet listings, as well as new listings
 columns = ['Ad_Name', 'ID', 'AD Date', 'Price', 'Location', 'URL', 'Image_Path']
-listing_df = pd.DataFrame(columns=columns)
+all_listings_df = pd.DataFrame(columns=columns)
+new_listings_df = pd.DataFrame(columns=columns)
 
 # compile listings to dataframe
 row = 0
@@ -183,15 +189,34 @@ for i in range(number_of_ads):
         print("list index out of range")
 
     # append to dataframe
-    listing_df.loc[row] = all_listings
+    all_listings_df.loc[row] = all_listings
 
-# export file to excel
-listing_path = os.path.join('C:\\', 'users', 'ccholon', 'my documents', 'castanet images', 'bbq_listings.xlsx')
+    if all_listings not in past_listings:
+        # print("check values")
+        # print(all_listings)
+        # input(past_listings)
+        new_listings = all_listings
+        new_listings_df.loc[row] = new_listings
+        past_listings.append(new_listings)
+
+# export files to excel
+listing_path = os.path.join('C:\\', 'users', 'ccholon', 'my documents', 'castanet images', 'all_bbq_listings.xlsx')
 xlwriter = pd.ExcelWriter(listing_path, engine='xlsxwriter')
-
-listing_df.to_excel(xlwriter, sheet_name='Sheet 1')
-
+all_listings_df.to_excel(xlwriter, sheet_name='Sheet 1')
 xlwriter.save()
+
+listing_path = os.path.join('C:\\', 'users', 'ccholon', 'my documents', 'castanet images', 'new_bbq_listings.xlsx')
+xlwriter = pd.ExcelWriter(listing_path, engine='xlsxwriter')
+new_listings_df.to_excel(xlwriter, sheet_name='Sheet 1')
+xlwriter.save()
+
+for i in past_listings:
+    input(i)
+
+# shelve listings for next run
+shelf_file = shelve.open('bbq_listings')
+shelf_file['past_listings'] = past_listings
+shelf_file.close()
 
 # TODO - process excel file and insert hyperlinks where necessary
 # TODO - log ID's to file for future lookup, avoid pulling duplicate listings
