@@ -8,6 +8,7 @@ import pandas as pd
 import time
 import xlsxwriter
 import shelve
+import csv
 
 
 def find_listing_date(soup, dates):
@@ -125,9 +126,19 @@ def extract_url_from_result(soup, url, listing_id):
 
 
 # --MAIN--
-shelf_file = shelve.open('bbq_listings')
-past_listings = shelf_file['past_listings']
-shelf_file.close()
+
+# Retrieve listing history to identify new ads
+# shelf_file = shelve.open('bbq_listings')
+# past_listings = shelf_file['past_listings']
+# shelf_file.close()
+try:
+    input_list = open('listing_history.csv')
+    past_listings = list(input_list)
+    input_list.close()
+except:
+    past_listings = []
+    print("Previous listings unavailable")
+
 
 # base URL - Castanet BBQ, Smokers, Heaters
 base_url = "https://classifieds.castanet.net/cat/house-home/garden_yard_patio/bbqs_smokers_heaters/?p="
@@ -210,13 +221,18 @@ xlwriter = pd.ExcelWriter(listing_path, engine='xlsxwriter')
 new_listings_df.to_excel(xlwriter, sheet_name='Sheet 1')
 xlwriter.save()
 
+# save contents to CSV for future reference
+output = open('listing_history.csv', 'w', newline='')
+output_writer = csv.writer(output)
 for i in past_listings:
-    input(i)
+    output_writer.writerow(i)
+
+output.close()
 
 # shelve listings for next run
-shelf_file = shelve.open('bbq_listings')
-shelf_file['past_listings'] = past_listings
-shelf_file.close()
+# shelf_file = shelve.open('bbq_listings')
+# shelf_file['past_listings'] = past_listings
+# shelf_file.close()
 
 # TODO - process excel file and insert hyperlinks where necessary
 # TODO - log ID's to file for future lookup, avoid pulling duplicate listings
