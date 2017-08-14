@@ -194,19 +194,19 @@ for i in range(number_of_ads):
 
     # create variable to store current row
     try:
-        all_listings = [ads[i], ids[i], dates[i], prices[i], locations[i], "https://classifieds.castanet.net" + urls[i],\
+        current_listing = [ads[i], ids[i], dates[i], prices[i], locations[i], "https://classifieds.castanet.net" + urls[i],\
                         image_list[i]]
     except:
         print("list index out of range")
 
     # append to dataframe
-    all_listings_df.loc[row] = all_listings
+    all_listings_df.loc[row] = current_listing
 
-    if all_listings not in past_listings:
+    if current_listing not in past_listings:
         # print("check values")
         # print(all_listings)
         # input(past_listings)
-        new_listings = all_listings
+        new_listings = current_listing
         new_listings_df.loc[row] = new_listings
         past_listings.append(new_listings)
 
